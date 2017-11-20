@@ -271,6 +271,13 @@ function islandora_compound_object_islandora_compoundCModel_islandora_view_objec
 }
 
 /**
+ * Implements hook_CMODEL_PID_islandora_view_object().
+ */
+function islandora_compound_object_islandora_sp_large_image_cmodel_islandora_view_object($object, $page_number, $page_size) {
+  // hacky fix for the moment.
+  return array(NULL => array('#markup' => ''));
+}
+/**
  * Access callback for compound object management.
  */
 function islandora_compound_object_access(AbstractObject $object) {
