@@ -264,19 +264,13 @@ function islandora_compound_object_islandora_compoundCModel_islandora_view_objec
         // Get view of first child.
         $first_child = islandora_object_load($first_child_id);
         drupal_set_title($first_child->label);
-        return islandora_view_object($first_child);
+        module_load_include('inc', 'islandora', 'includes/metadata');
+        return islandora_retrieve_metadata_markup($object);
       }
     }
   }
 }
 
-/**
- * Implements hook_CMODEL_PID_islandora_view_object().
- */
-function islandora_compound_object_islandora_sp_large_image_cmodel_islandora_view_object($object, $page_number, $page_size) {
-  // hacky fix for the moment.
-  return array(NULL => array('#markup' => ''));
-}
 /**
  * Access callback for compound object management.
  */
