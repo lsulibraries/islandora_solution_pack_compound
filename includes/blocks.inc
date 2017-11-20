@@ -54,6 +54,10 @@ function islandora_compound_object_jail_display_block() {
           '#type' => 'item',
           '#markup' => l(t('manage parent'), $compound_info['parent_url']),
         );
+        $block['parent_link'] = array(
+          '#type' => 'item',
+          '#markup' => l(t('Parent'), '/islandora/object/' . $compound_info['parent_pid']),
+        );
       }
 
       $query_params = drupal_get_query_parameters();
