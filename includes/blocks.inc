@@ -96,13 +96,18 @@ function islandora_compound_object_jail_display_block() {
             '#title' => t("@title", array("@title" => $sibling['title'])),
             '#href' => "islandora/object/{$sibling['pid']}",
             '#options' => array('query' => $query_params),
+            '#attributes' => array(
+              'class' => 'compoundSelect-title',
+            ),
           ),
           'content' => array(
             '#theme' => 'link',
             '#text' => drupal_render($img),
             '#path' => "islandora/object/{$sibling['pid']}",
             '#options' => array(
-              'attributes' => array(),
+              'attributes' => array(
+              'class' => 'compoundSelect-thumbnail',
+            ),
               'html' => TRUE,
               'query' => $query_params,
             ),
