@@ -88,7 +88,9 @@ function islandora_compound_object_jail_display_block() {
         );
         $block[$sibling['pid']] = array(
           '#type' => 'container',
-          '#attributes' => array(),
+          '#attributes' => array(
+           'class' => 'compoundSelect',
+          ),
           'link' => array(
             '#type' => 'link',
             '#title' => t("@title", array("@title" => $sibling['title'])),
