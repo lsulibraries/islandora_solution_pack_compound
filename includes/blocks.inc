@@ -53,10 +53,14 @@ function islandora_compound_object_jail_display_block() {
         $block['manage_link'] = array(
           '#type' => 'item',
           '#markup' => l(t('manage parent'), $compound_info['parent_url']),
+          '#prefix' => '<div class="manageParent">',
+          '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes
         );
         $block['parent_link'] = array(
           '#type' => 'item',
           '#markup' => l(t('Parent'), '/islandora/object/' . $compound_info['parent_pid']),
+          '#prefix' => '<div class="parentLink">',
+          '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes          
         );
       }
 
@@ -89,7 +93,7 @@ function islandora_compound_object_jail_display_block() {
         $block[$sibling['pid']] = array(
           '#type' => 'container',
           '#attributes' => array(
-           'class' => 'compoundSelect',
+           'class' => 'compoundSelect', //class neeeded for custom styles
           ),
           'link' => array(
             '#type' => 'link',
@@ -97,7 +101,7 @@ function islandora_compound_object_jail_display_block() {
             '#href' => "islandora/object/{$sibling['pid']}",
             '#options' => array('query' => $query_params),
             '#attributes' => array(
-              'class' => 'compoundSelect-title',
+              'class' => 'compoundSelect-title', //class neeeded for custom styles
             ),
           ),
           'content' => array(
@@ -106,7 +110,7 @@ function islandora_compound_object_jail_display_block() {
             '#path' => "islandora/object/{$sibling['pid']}",
             '#options' => array(
               'attributes' => array(
-              'class' => 'compoundSelect-thumbnail',
+              'class' => 'compoundSelect-thumbnail', //class neeeded for custom styles
             ),
               'html' => TRUE,
               'query' => $query_params,
