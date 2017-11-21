@@ -43,11 +43,14 @@ function islandora_compound_object_jail_display_block() {
       );
       $block['part_title'] = array(
         '#type' => 'item',
-        '#markup' => t('Part of: @label (@count @obj)', array(
+        '#markup' => t('<a href="@linkback"><div class="compoundParent">@label</div></a> <div class="compoundCount">@count @obj</div>', array( //edited
           '@label' => $compound_info['parent_label'],
           '@count' => $compound_info['child_count'],
+          '@linkback' => '/islandora/object/' . $compound_info['parent_pid'],
           '@obj' => format_plural($compound_info['child_count'], 'object', 'objects'),
         )),
+          '#prefix' => '<div class="compoundGallery_header">',
+          '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes   
       );
       if ($compound_info['parent_url']) {
         $block['manage_link'] = array(
@@ -55,12 +58,6 @@ function islandora_compound_object_jail_display_block() {
           '#markup' => l(t('manage parent'), $compound_info['parent_url']),
           '#prefix' => '<div class="manageParent">',
           '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes
-        );
-        $block['parent_link'] = array(
-          '#type' => 'item',
-          '#markup' => l(t('Parent'), '/islandora/object/' . $compound_info['parent_pid']),
-          '#prefix' => '<div class="parentLink">',
-          '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes          
         );
       }
 
