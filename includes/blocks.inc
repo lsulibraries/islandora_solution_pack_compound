@@ -98,7 +98,7 @@ function islandora_compound_object_jail_display_block() {
             '#href' => "islandora/object/{$sibling['pid']}",
             '#options' => array('query' => $query_params),
             '#attributes' => array(
-              'class' => 'compoundSelect-title', //class neeeded for custom styles
+              'class' => array('compoundSelect-title'), //class neeeded for custom styles
             ),
           ),
           'content' => array(
