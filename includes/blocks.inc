@@ -16,13 +16,14 @@ function islandora_compound_object_jail_display_block() {
   $object = menu_get_object('islandora_object', 2);
   if ($object) {
     $compound_info = islandora_compound_object_retrieve_compound_info($object, TRUE);
-    $parent = islandora_object_load($compound_info['parent_pid']);
-    $relationships = $parent->relationships->get('info:fedora/fedora-system:def/relations-external#', "isMemberOfCollection");
-    $parent_collection = islandora_object_load($relationships[0]['object']['value']);
-    $parent_collection_link = sprintf("/islandora/object/%s", $parent_collection->id);
-    $collection_label = $parent_collection->label;
 
     if (!empty($compound_info)) {
+      $parent = islandora_object_load($compound_info['parent_pid']);
+      $relationships = $parent->relationships->get('info:fedora/fedora-system:def/relations-external#', "isMemberOfCollection");
+      $parent_collection = islandora_object_load($relationships[0]['object']['value']);
+      $parent_collection_link = sprintf("/islandora/object/%s", $parent_collection->id);
+      $collection_label = $parent_collection->label;
+
       $module_path = drupal_get_path('module', 'islandora_compound_object');
       $jail_path = libraries_get_path('JAIL');
       $block['#attached']['js'] = array(
