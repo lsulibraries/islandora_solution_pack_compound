@@ -49,9 +49,11 @@ function islandora_compound_object_jail_display_block() {
       );
       $block['part_title'] = array(
         '#type' => 'item',
-        '#markup' => t('<a href="@linkback"><div class="compoundParent">@label</div></a> <div class="compoundCount">@count @obj</div>', array( //edited
+        '#markup' => t('<a href="@linkback"><div class="compoundParent">@label</div></a><a href="@parentLink" class="parentLink">@parentLabel</a><div class="compoundCount">@count @obj</div>', array( //edited
           '@label' => $compound_info['parent_label'],
           '@count' => $compound_info['child_count'],
+          '@parentLink' => $parent_collection_link,
+          '@parentLabel' => $collection_label,
           '@linkback' => '/islandora/object/' . $compound_info['parent_pid'],
           '@obj' => format_plural($compound_info['child_count'], 'object', 'objects'),
         )),
