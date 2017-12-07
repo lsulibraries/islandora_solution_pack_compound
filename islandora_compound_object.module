@@ -265,7 +265,13 @@ function islandora_compound_object_islandora_compoundCModel_islandora_view_objec
         $first_child = islandora_object_load($first_child_id);
         drupal_set_title($first_child->label);
         module_load_include('inc', 'islandora', 'includes/metadata');
-        return islandora_retrieve_metadata_markup($object);
+        $models = $first_child->models;
+        if(in_array("islandora:sp-ohCModel", $models)) {
+          return islandora_view_object($first_child);
+        }
+        else {
+          return islandora_retrieve_metadata_markup($object);
+	}
       }
     }
   }
