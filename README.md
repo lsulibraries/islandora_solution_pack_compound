@@ -4,6 +4,18 @@
 
 The Islandora Compound Object Solution Pack enables generic parent-child relationships between objects. The object view of a compound object is replaced by the view of its first child object. The included "Islandora Compound Object Navigation" block provides a thumbnail navigation of an object's siblings. A "Compound" management tab allows for the addition and removal of parent and child objects for each object.
 
+## Requirements
+
+This module requires the following modules/libraries:
+
+* [Islandora](https://github.com/islandora/islandora)
+
+This module has the following as optional requirements for certain features:
+
+For Islandora Compound Object JAIL Display:
+
+* [JAIL](https://github.com/sebarmeli/JAIL) library 
+
 ## Installation
 
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
@@ -13,22 +25,28 @@ library must be present within sites/all/libraries/JAIL.
 
 ## Configuration
 
-Set the 'Child releationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
+Set the 'Child relationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
 
 Optionally, enable the JAIL compound block to utilize the lazy loading image
 ability as outlined below.
 
-![Configuration](https://raw.githubusercontent.com/dmoses/islandora_screenshots/master/compound-admin.png)
+![compound_solution_pack_admin](https://user-images.githubusercontent.com/25011926/32280294-bab317e0-bef1-11e7-975b-f12efcd16b95.png)
+
+
 
 **Block**:
 
-There exists two block options for displaying compound objects within Islandora.
+There exist two block options for displaying compound objects within Islandora.
 The default "Islandora Compound Object Navigation" block will provide navigation
 controls and loading of all objects related to the parent compound. The latter
 option is a block utilizing the [JAIL](https://github.com/sebarmeli/JAIL)
 library which allows for lazy loading of images. This allows the block to load
 images only when they are being accessed which will greatly increase performance
 on compounds with many children.
+
+![compound_solution_pack_block](https://user-images.githubusercontent.com/25011926/32280310-c82c0440-bef1-11e7-936f-99f74e51e716.png)
+
+
 
 **Theme**:
 

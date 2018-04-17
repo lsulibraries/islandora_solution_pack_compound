@@ -15,12 +15,15 @@ function islandora_compound_object_jail_display_block() {
   $block = array();
   $object = menu_get_object('islandora_object', 2);
   if ($object) {
-    // If only compound cmodel objects can be compound, this isn't necessary.
-    $children = islandora_compound_object_get_parts($object);
-    $pid = (!empty($children)) ? $children[0] : $object->id;
-    $compound_object = islandora_object_load($pid);
-    $compound_info = islandora_compound_object_retrieve_compound_info($compound_object);
-    if ($compound_info) {
+    $compound_info = islandora_compound_object_retrieve_compound_info($object, TRUE);
+
+    if (!empty($compound_info)) {
+      $parent = islandora_object_load($compound_info['parent_pid']);
+      $relationships = $parent->relationships->get('info:fedora/fedora-system:def/relations-external#', "isMemberOfCollection");
+      $parent_collection = islandora_object_load($relationships[0]['object']['value']);
+      $parent_collection_link = sprintf("/islandora/object/%s", $parent_collection->id);
+      $collection_label = $parent_collection->label;
+
       $module_path = drupal_get_path('module', 'islandora_compound_object');
       $jail_path = libraries_get_path('JAIL');
       $block['#attached']['js'] = array(
@@ -34,38 +37,46 @@ function islandora_compound_object_jail_display_block() {
           'group' => JS_LIBRARY,
         ),
       );
+      $block['#attached']['js'][] = array(
+        'data' => array(
+          'islandora_compound_object' => array(
+            'image_path' => url(drupal_get_path('module', 'islandora') . '/images/folder.png'),
+          ),
+        ),
+        'type' => 'setting',
+      );
       $block['#attached']['css'] = array(
         "$module_path/css/islandora_compound_object.jail_block.css",
       );
       $block['part_title'] = array(
         '#type' => 'item',
-        '#markup' => t('Part of: @label (@count @obj)', array(
+        '#markup' => t('<a href="@linkback"><div class="compoundParent">@label</div></a><a href="@parentLink" class="parentLink">@parentLabel</a><div class="compoundCount">@count @obj</div>', array( //edited
           '@label' => $compound_info['parent_label'],
           '@count' => $compound_info['child_count'],
+          '@parentLink' => $parent_collection_link,
+          '@parentLabel' => $collection_label,
+          '@linkback' => '/islandora/object/' . $compound_info['parent_pid'],
           '@obj' => format_plural($compound_info['child_count'], 'object', 'objects'),
         )),
+          '#prefix' => '<div class="compoundGallery_header">',
+          '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes   
       );
       if ($compound_info['parent_url']) {
         $block['manage_link'] = array(
           '#type' => 'item',
           '#markup' => l(t('manage parent'), $compound_info['parent_url']),
+          '#prefix' => '<div class="manageParent">',
+          '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes
         );
       }
-      foreach ($compound_info['siblings'] as $sibling) {
-        $sibling_object = islandora_object_load($sibling);
-        if (isset($sibling_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $sibling_object['TN'])) {
-          $path = 'islandora/object/' . $sibling . '/datastream/TN/view';
-        }
-        else {
-          // Object either does not have a thumbnail or it's restricted show a
-          // default in its place.
-          $image_path = drupal_get_path('module', 'islandora');
-          $path = "$image_path/images/folder.png";
-        }
+
+      $query_params = drupal_get_query_parameters();
+      foreach ($compound_info['siblings_detailed'] as $sibling) {
+        $path = 'islandora/object/' . $sibling['pid'] . '/datastream/TN/view';
         $class = array(
           'islandora-compound-object-jail',
         );
-        if ($sibling == $pid) {
+        if ($sibling['pid'] == $compound_info['current_pid']) {
           $class[] = 'islandora-compound-object-jail-active';
         }
         $img = array(
@@ -76,7 +87,7 @@ function islandora_compound_object_jail_display_block() {
               'class' => $class,
               'data-src' => url($path),
             ),
-            '#href' => "islandora/object/$sibling",
+            '#href' => "islandora/object/{$sibling['pid']}",
           ),
           'noscript' => array(
             '#theme' => 'image',
@@ -85,21 +96,30 @@ function islandora_compound_object_jail_display_block() {
             '#suffix' => '</noscript>',
           ),
         );
-        $block[$sibling] = array(
+        $block[$sibling['pid']] = array(
           '#type' => 'container',
-          '#attributes' => array(),
+          '#attributes' => array(
+           'class' => 'compoundSelect', //class neeeded for custom styles
+          ),
           'link' => array(
             '#type' => 'link',
-            '#title' => t("@title", array("@title" => $sibling_object->label)),
-            '#href' => "islandora/object/$sibling",
+            '#title' => t("@title", array("@title" => $sibling['title'])),
+            '#href' => "islandora/object/{$sibling['pid']}",
+            '#options' => array('query' => $query_params),
+            '#attributes' => array(
+              'class' => array('compoundSelect-title'), //class neeeded for custom styles
+            ),
           ),
           'content' => array(
             '#theme' => 'link',
             '#text' => drupal_render($img),
-            '#path' => "islandora/object/$sibling",
+            '#path' => "islandora/object/{$sibling['pid']}",
             '#options' => array(
-              'attributes' => array(),
+              'attributes' => array(
+              'class' => 'compoundSelect-thumbnail', //class neeeded for custom styles
+            ),
               'html' => TRUE,
+              'query' => $query_params,
             ),
           ),
         );
@@ -123,13 +143,9 @@ function islandora_compound_object_navigation_block(AbstractObject $object = NUL
   drupal_add_css(drupal_get_path('module', 'islandora_compound_object') . '/css/islandora_compound_object.block.css');
   $object = $object ? $object : menu_get_object('islandora_object', 2);
   if ($object) {
-    // If only compound cmodel objects can be compound, this isn't necessary.
-    $children = islandora_compound_object_get_parts($object->id);
-    $pid = (!empty($children)) ? $children[0] : $object->id;
-    $object = islandora_object_load($pid);
     $output = '';
     if ($object) {
-      $compound_info = islandora_compound_object_retrieve_compound_info($object);
+      $compound_info = islandora_compound_object_retrieve_compound_info($object, TRUE);
       // This object is part of a compound object.
       if (!empty($compound_info)) {
         $prev_next = theme('islandora_compound_prev_next', $compound_info);
