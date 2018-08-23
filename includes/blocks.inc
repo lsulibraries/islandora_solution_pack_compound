@@ -76,8 +76,10 @@ function islandora_compound_object_jail_display_block() {
         $class = array(
           'islandora-compound-object-jail',
         );
+        $thisiscurrent = '';
         if ($sibling['pid'] == $compound_info['current_pid']) {
           $class[] = 'islandora-compound-object-jail-active';
+          $thisiscurrent = 'activeChild';
         }
         $img = array(
           'image' => array(
@@ -116,7 +118,7 @@ function islandora_compound_object_jail_display_block() {
             '#path' => "islandora/object/{$sibling['pid']}",
             '#options' => array(
               'attributes' => array(
-              'class' => 'compoundSelect-thumbnail', //class neeeded for custom styles
+              'class' => "compoundSelect-thumbnail $thisiscurrent", //class neeeded for custom styles
             ),
               'html' => TRUE,
               'query' => $query_params,
