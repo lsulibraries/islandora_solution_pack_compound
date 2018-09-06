@@ -78,7 +78,7 @@ function islandora_compound_object_jail_display_block() {
         );
         $thisiscurrent = '';
         if ($sibling['pid'] == $compound_info['current_pid'] && $object->id != $compound_info['parent_pid']) {
-          $class[] = 'islandora-compound-object-jail-active';
+          $class[] = 'islandora-compound-object-jail-active image-thumbnail';
           $thisiscurrent = 'currentImage';
         }
         
