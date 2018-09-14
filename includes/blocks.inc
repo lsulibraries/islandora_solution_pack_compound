@@ -58,7 +58,7 @@ function islandora_compound_object_jail_display_block() {
           '@linkback' => '/islandora/object/' . $compound_info['parent_pid'],
           '@obj' => format_plural($compound_info['child_count'], 'object', 'objects'),
         )),
-          '#prefix' => '<div class="compoundGallery_header">',
+          '#prefix' => '<div class="compoundGallery_header item_header">',
           '#suffix' => '</div>', // drupal item type cannot use #attributes so this is a workaround to create classes   
       );
       if ($compound_info['parent_url']) {
@@ -76,9 +76,13 @@ function islandora_compound_object_jail_display_block() {
         $class = array(
           'islandora-compound-object-jail',
         );
-        if ($sibling['pid'] == $compound_info['current_pid']) {
-          $class[] = 'islandora-compound-object-jail-active';
+        $thisiscurrent = '';
+        if ($sibling['pid'] == $compound_info['current_pid'] && $object->id != $compound_info['parent_pid']) {
+          $class[] = 'islandora-compound-object-jail-active image-thumbnail';
+          $thisiscurrent = 'currentImage';
         }
+        
+
         $img = array(
           'image' => array(
             '#theme' => 'image',
@@ -99,7 +103,7 @@ function islandora_compound_object_jail_display_block() {
         $block[$sibling['pid']] = array(
           '#type' => 'container',
           '#attributes' => array(
-           'class' => 'compoundSelect', //class neeeded for custom styles
+           'class' => "compoundSelect $thisiscurrent", //class neeeded for custom styles
           ),
           'link' => array(
             '#type' => 'link',
