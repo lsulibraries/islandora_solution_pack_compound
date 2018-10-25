@@ -152,6 +152,17 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
           form_set_error('child', t('The object is already a parent of the child.'));
         }
       }
+
+      if ($child_object->id == $root = variable_get('islandora_repository_pid', 'islandora:root')) {
+        form_set_error('child', t('Repository root cannot be a child of an object.'));
+      }
+      if (variable_get('islandora_compound_object_prevent_ancestor_as_child', TRUE) && $object) {
+        $ancestors = islandora_compound_object_get_ancestors($object->id);
+        if (in_array($child_object->id, $ancestors)) {
+          $msg = t("Proposed child @child is an ancestor of @ancestor", array('@child' => $child_object->id, '@ancestor' => $object->id));
+          form_set_error('child', $msg);
+        }
+      }
     }
     else {
       form_set_error('child', t('Invalid object supplied.'));
@@ -448,6 +459,37 @@ function islandora_compound_object_add_parent($objects, $parent_pids) {
   }
 
   module_invoke_all('islandora_compound_object_children_added_to_parent', $objects, $parent_pids);
+}
+
+function islandora_compound_object_get_ancestors($object) {
+  if (!is_object($object)) {
+    $object = islandora_object_load($object);
+  }
+
+  $stvar_cycles = __FUNCTION__ . '_cycle_detection';
+  $ancestors = &drupal_static($stvar_cycles);
+  if (NULL == $ancestors) {
+    $ancestors = [];
+  }
+
+  $root = variable_get('islandora_repository_pid', 'islandora:root');
+  $ancestor_rels = array('isConstituentOf', 'isMemberOfCollection', 'isMemberOf');
+  $relationships = $object->relationships->get();
+  foreach ($ancestor_rels as $preferred_link) {
+    foreach ($relationships as $rel) {
+      if ($rel['predicate']['value'] === $preferred_link) {
+        $ancestor = islandora_object_load($rel['object']['value']);
+        if(!$ancestor || $ancestor->id == $root) {
+          continue;
+        }
+        else {
+          $ancestors[] = $ancestor->id;
+          $ancestors = array_unique(array_merge($ancestors, islandora_compound_object_get_ancestors($ancestor)));
+        }
+      }
+    }
+  }
+  return $ancestors;
 }
 
 /**
